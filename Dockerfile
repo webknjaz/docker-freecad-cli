@@ -85,7 +85,6 @@ RUN \
 RUN apt update \
     && apt install -y --no-install-recommends software-properties-common \    
     && add-apt-repository -y ppa:jonathonf/python-3.6 \
-    && add-apt-repository ppa:sppedflyer/mytestppa1 \
 
   # Install
 
