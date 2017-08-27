@@ -37,6 +37,8 @@ MAINTAINER Leonardo Loures <luvres@hotmail.com>
 # - python-dev
 # - python
 
+RUN apt-get update
+
 RUN \
     pack_build="git \
                 build-essential \
@@ -69,7 +71,7 @@ RUN \
                 libmedc-dev \
                 libvtk6-dev \
                 libproj-dev " \
-    && apt-get update \
+#    && apt-get update \
     && apt install -y \
                 $pack_build \
                 gmsh
