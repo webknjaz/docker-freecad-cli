@@ -96,23 +96,24 @@ RUN apt update \
     && apt install -y \
                 $pack_build
 
-RUN \
-  # Uninstall
-
-    pack_remove=" \
-                python-dev \
-    " \
-    && apt remove -y \
-                $pack_remove
-                #python \
-                # \
-    #&& apt autoremove -y
+# RUN \
+#   # Uninstall
+# 
+#     pack_remove=" \
+#                  \
+#     " \
+#     && apt remove -y \
+#                 $pack_remove
+#                 #python \
+#                 # \
+#     #&& apt autoremove -y
 
 ENV PYTHON_EXECUTABLE=/usr/bin/python3.6m
 ENV PYTHON_INCLUDE_DIR=/usr/include/python3.6m
 ENV PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so
 ENV PYTHON_BASENAME=.cpython-36m
 ENV PYTHON_SUFFIX=.cpython-36m
+
 RUN cd ~/freecad-build \
   # Build
     && export PYTHON_EXECUTABLE=/usr/bin/python3.6m \
