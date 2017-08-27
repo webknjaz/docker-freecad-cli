@@ -34,12 +34,13 @@ MAINTAINER Leonardo Loures <luvres@hotmail.com>
 ##############################################################################
 # Unsure:
 # - python-matplotlib
+# - python-dev
+# - python
 
 RUN \
     pack_build="git \
                 build-essential \
                 cmake \
-                python \
                 libtool \
                 libxerces-c-dev \
                 libboost-dev \
@@ -52,7 +53,6 @@ RUN \
                 libqt4-dev \
                 libqt4-opengl-dev \
                 qt4-dev-tools \
-                python-dev \
                 liboce-modeling-dev \
                 liboce-visualization-dev \
                 liboce-foundation-dev \
