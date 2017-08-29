@@ -1,46 +1,20 @@
-FROM izone/freecad:nvidia
-MAINTAINER Leonardo Loures <luvres@hotmail.com>
+FROM ubuntu:16.04
+MAINTAINER Sviatoslav Sydorenko <wk+freecad-cli-py3.6-docker@sydorenko.org.ua>
 
-#RUN apt update \
-#    && apt install -y --no-install-recommends software-properties-common \    
-#    && add-apt-repository -y ppa:freecad-maintainers/freecad-daily
+ENV PYTHON_VERSION 3.6.2
+ENV PYTHON_MINOR_VERSION 3.6
+ENV PYTHON_SUFFIX_VERSION .cpython-36m
+ENV PYTHON_BIN_VERSION python3.6m
+# if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
+ENV PYTHON_PIP_VERSION 9.0.1
 
-# pivy is a binding for Coin3D
-# Coin3D is used for displaying 3D models
-# So it should be safe to remove it
-# Ref: https://www.freecadweb.org/wiki/Scenegraph
-
-# pyside is used for GUI, and since we build CLI only it's not needed:
-# - libpyside-dev
-# - pyside-tools
-# - python-pyside
-# - python3-pyside
-
-# pivy build depends on:
-# - swig3.0
-# - libcoin80
-# - libcoin80-dev
-# - libsoqt4-dev
-# - libsimage-dev
-# - libshiboken-dev
-# - python3-pyside
-# - python-pyside
-# So it should be safe to remove them as well
-# Ref: https://github.com/FreeCAD/pivy/blob/master/.travis.yml#L9-L19
-# Also rm:
-# - python-pivy
-# - python3-pivy
-
-##############################################################################
-# Unsure:
-# - python-matplotlib
-# - python-dev
-# - python
-
-RUN apt-get update
+ENV FREECAD_VERSION master
 
 RUN \
     pack_build="git \
+                python$PYTHON_MINOR_VERSION \
+                python$PYTHON_MINOR_VERSION-dev \
+                wget \
                 build-essential \
                 cmake \
                 libtool \
@@ -70,65 +44,50 @@ RUN \
                 netgen-headers \
                 libmedc-dev \
                 libvtk6-dev \
-                libproj-dev " \
-#    && apt-get update \
-    && apt install -y \
-                $pack_build \
-                gmsh
+                libproj-dev \
+                gmsh " \
+    && apt update \
+    && apt install -y --no-install-recommends software-properties-common \
+    && add-apt-repository -y ppa:jonathonf/python-$PYTHON_MINOR_VERSION \
+    && apt update \
+    && apt install -y --no-install-recommends $pack_build
+
+RUN set -ex; \
+    \
+    wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
+    \
+    python$PYTHON_MINOR_VERSION get-pip.py \
+        --disable-pip-version-check \
+        --no-cache-dir \
+        "pip==$PYTHON_PIP_VERSION" \
+    ; \
+    pip --version; \
+    \
+    find /usr/local -depth \
+        \( \
+            \( -type d -a \( -name test -o -name tests \) \) \
+            -o \
+            \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
+        \) -exec rm -rf '{}' +; \
+    rm -f get-pip.py
+
+ENV PYTHONPATH "/usr/local/lib:$PYTHONPATH"
 
 RUN \
   # get FreeCAD Git
     cd \
-    && git clone https://github.com/FreeCAD/FreeCAD.git \
-    && mkdir freecad-build
-
-RUN apt update \
-    && apt install -y --no-install-recommends software-properties-common \    
-    && add-apt-repository -y ppa:jonathonf/python-3.6 \
-
-  # Install
-
-    && pack_build=" \
-                python3.6 \
-                python3.6-dev \
-    " \
-    && apt-get update \
-    && apt install -y \
-                $pack_build
-
-# RUN \
-#   # Uninstall
-# 
-#     pack_remove=" \
-#                  \
-#     " \
-#     && apt remove -y \
-#                 $pack_remove
-#                 #python \
-#                 # \
-#     #&& apt autoremove -y
-
-ENV PYTHON_EXECUTABLE=/usr/bin/python3.6m
-ENV PYTHON_INCLUDE_DIR=/usr/include/python3.6m
-ENV PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so
-ENV PYTHON_BASENAME=.cpython-36m
-ENV PYTHON_SUFFIX=.cpython-36m
-
-RUN cd ~/freecad-build \
+    && git clone --branch "$FREECAD_VERSION" https://github.com/FreeCAD/FreeCAD.git \
+    && mkdir freecad-build \
+    && cd freecad-build \
   # Build
-    && export PYTHON_EXECUTABLE=/usr/bin/python3.6m \
-    && export PYTHON_INCLUDE_DIR=/usr/include/python3.6m \
-    && export PYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so \
-    && export PYTHON_BASENAME=.cpython-36m \
-    && export PYTHON_SUFFIX=.cpython-36m \
     && cmake \
         -DBUILD_GUI=OFF \
         -DBUILD_QT5=OFF \
-        -DPYTHON_EXECUTABLE=/usr/bin/python3.6m \
-        -DPYTHON_INCLUDE_DIR=/usr/include/python3.6m \
-        -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so \
-        -DPYTHON_BASENAME=.cpython-36m \
-        -DPYTHON_SUFFIX=.cpython-36m \
+        -DPYTHON_EXECUTABLE=/usr/bin/$PYTHON_BIN_VERSION \
+        -DPYTHON_INCLUDE_DIR=/usr/include/$PYTHON_BIN_VERSION \
+        -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/lib${PYTHON_BIN_VERSION}.so \
+        -DPYTHON_BASENAME=$PYTHON_SUFFIX_VERSION \
+        -DPYTHON_SUFFIX=$PYTHON_SUFFIX_VERSION \
         -DCMAKE_BUILD_TYPE=Release \
         -DBUILD_FEM_NETGEN=ON ../FreeCAD \
   \
@@ -137,24 +96,13 @@ RUN cd ~/freecad-build \
     && cd \
               \
               # Clean
-#                 && rm FreeCAD/ freecad-build/ -fR \
+                && rm FreeCAD/ freecad-build/ -fR \
                 && ln -s /usr/local/bin/FreeCAD /usr/bin/freecad-git
 
-# # Calculix
-# ENV CCX_VERSION=2.12
-# RUN apt-get install -y gfortran xorg-dev wget cpio \
-#     && cd \
-#     && git clone https://github.com/luvres/graphics.git \
-#     && cd graphics/calculix-$CCX_VERSION/ \
-#     && ./install \
-#     && cp $HOME/CalculiX-$CCX_VERSION/bin/ccx_$CCX_VERSION /usr/bin/ccx \
-#     && cp $HOME/CalculiX-$CCX_VERSION/bin/cgx /usr/bin/cgx \
-#     && cd && rm CalculiX-$CCX_VERSION graphics -fR
-
-# # Clean
-# RUN apt-get clean \
-#     && rm /var/lib/apt/lists/* \
-#           /usr/share/doc/* \
-#           /usr/share/locale/* \
-#           /usr/share/man/* \
-#           /usr/share/info/* -fR    
+# Clean
+RUN apt-get clean \
+    && rm /var/lib/apt/lists/* \
+          /usr/share/doc/* \
+          /usr/share/locale/* \
+          /usr/share/man/* \
+          /usr/share/info/* -fR    
