@@ -6,7 +6,7 @@ ENV PYTHON_MINOR_VERSION 3.6
 ENV PYTHON_SUFFIX_VERSION .cpython-36m
 ENV PYTHON_BIN_VERSION python3.6m
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 9.0.1
+ENV PYTHON_PIP_VERSION 18.0
 
 ENV FREECAD_VERSION master
 
