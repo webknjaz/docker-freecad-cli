@@ -50,7 +50,7 @@ RUN \
                 gmsh " \
     && apt update \
     && apt install -y --no-install-recommends software-properties-common \
-    && add-apt-repository -y ppa:jonathonf/python-$PYTHON_MINOR_VERSION \
+    && add-apt-repository -y ppa:deadsnakes/ppa \
     && apt update \
     && apt install -y --no-install-recommends $pack_build
 
