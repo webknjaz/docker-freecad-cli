@@ -112,6 +112,10 @@ RUN set -ex; \
         \) -exec rm -rf '{}' +; \
     rm -f get-pip.py
 
+RUN cd /usr/local/bin \
+	&& ln -s python3 python
+
+
 FROM python_builder AS clone_freecad
 # get FreeCAD Git
 RUN \
