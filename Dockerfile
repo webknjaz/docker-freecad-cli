@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:16.04 AS base
 MAINTAINER Sviatoslav Sydorenko <wk+freecad-cli-py3.7-docker@sydorenko.org.ua>
 
 ENV PYTHON_VERSION 3.7.0
@@ -11,7 +11,7 @@ ENV PYTHON_PIP_VERSION 18.0
 ENV FREECAD_VERSION master
 ENV FREECAD_REPO git://github.com/FreeCAD/FreeCAD.git
 
-
+FROM base as builder
 RUN \
     pack_build="git \
                 python$PYTHON_MINOR_VERSION \
