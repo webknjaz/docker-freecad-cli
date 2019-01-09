@@ -11,7 +11,10 @@ ENV PYTHON_PIP_VERSION 18.1
 ENV FREECAD_VERSION master
 ENV FREECAD_REPO git://github.com/FreeCAD/FreeCAD.git
 
+
+
 FROM base as builder
+
 RUN \
     pack_build="git \
                 wget \
@@ -51,6 +54,7 @@ RUN \
     && apt install -y --no-install-recommends software-properties-common \
     && apt update \
     && apt install -y --no-install-recommends $pack_build
+
 
 
 FROM builder AS python_builder
@@ -116,11 +120,15 @@ RUN cd /usr/local/bin \
 	&& ln -s python3 python
 
 
+
 FROM python_builder AS clone_freecad
 # get FreeCAD Git
+
 RUN \
     cd \
     && git clone --branch "$FREECAD_VERSION" "$FREECAD_REPO"
+
+
 
 FROM clone_freecad AS compile_fc
 
