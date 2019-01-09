@@ -1,12 +1,12 @@
 FROM ubuntu:16.04 AS base
 MAINTAINER Sviatoslav Sydorenko <wk+freecad-cli-py3.7-docker@sydorenko.org.ua>
 
-ENV PYTHON_VERSION 3.7.0
+ENV PYTHON_VERSION 3.7.2
 ENV PYTHON_MINOR_VERSION 3.7
 ENV PYTHON_SUFFIX_VERSION .cpython-37m
 ENV PYTHON_BIN_VERSION python3.7m
 # if this is called "PIP_VERSION", pip explodes with "ValueError: invalid truth value '<VERSION>'"
-ENV PYTHON_PIP_VERSION 18.0
+ENV PYTHON_PIP_VERSION 18.1
 
 ENV FREECAD_VERSION master
 ENV FREECAD_REPO git://github.com/FreeCAD/FreeCAD.git
