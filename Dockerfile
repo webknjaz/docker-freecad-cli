@@ -112,12 +112,18 @@ RUN set -ex; \
         \) -exec rm -rf '{}' +; \
     rm -f get-pip.py
 
+FROM python_builder AS clone_freecad
+# get FreeCAD Git
+RUN \
+    cd \
+    && git clone --branch "$FREECAD_VERSION" "$FREECAD_REPO"
+
+FROM clone_freecad AS compile_fc
+
 ENV PYTHONPATH "/usr/local/lib:$PYTHONPATH"
 
 RUN \
-  # get FreeCAD Git
     cd \
-    && git clone --branch "$FREECAD_VERSION" "$FREECAD_REPO" \
     && mkdir freecad-build \
     && cd freecad-build \
   # Build
