@@ -1,7 +1,7 @@
 FROM ubuntu:16.04
 MAINTAINER Sviatoslav Sydorenko <wk+freecad-cli-py3.7-docker@sydorenko.org.ua>
 
-ENV PYTHON_VERSION 3.7.2
+ENV PYTHON_VERSION 3.7.3
 ENV PYTHON_MINOR_VERSION 3.7
 ENV PYTHON_SUFFIX_VERSION .cpython-37m
 ENV PYTHON_BIN_VERSION python3.7m
